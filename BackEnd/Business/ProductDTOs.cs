@@ -1,10 +1,9 @@
+using B2B_Proje.DataAccess.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace B2B_Proje.Business.DTOs.ProductDTOs
 {
-    // ==========================================
-    // 1. RESPONSE DTO (For reading/getting data)
-    // ==========================================
+
     public class ProductResponseDto
     {
         public int Id { get; set; }
@@ -13,7 +12,7 @@ namespace B2B_Proje.Business.DTOs.ProductDTOs
         public string Origin { get; set; }
         public string SizeRange { get; set; }
         public string Material { get; set; }
-        public string Gender { get; set; }
+        public ProductGender Gender { get; set; }
         public string ImageUrl { get; set; }
         public int StockQuantity { get; set; }
         public string Description { get; set; }
@@ -22,10 +21,6 @@ namespace B2B_Proje.Business.DTOs.ProductDTOs
         public DateTime CreatedAt { get; set; }
     }
 
-
-    // ==========================================
-    // 2. CREATE DTO (For adding a new product)
-    // ==========================================
     public class ProductCreateDto
     {
         [Required(ErrorMessage = "Product name is required.")]
@@ -48,7 +43,7 @@ namespace B2B_Proje.Business.DTOs.ProductDTOs
         public required string Material { get; set; }
 
         [Required(ErrorMessage = "Gender is required.")]
-        public required string Gender { get; set; }
+        public required ProductGender Gender { get; set; }
 
         [Required(ErrorMessage = "Image URL is required.")]
         public required string ImageUrl { get; set; }
@@ -63,10 +58,6 @@ namespace B2B_Proje.Business.DTOs.ProductDTOs
         public int CategoryId { get; set; }
     }
 
-
-    // ==========================================
-    // 3. UPDATE DTO (For editing a product)
-    // ==========================================
     public class ProductUpdateDto
     {
         [Required] 
@@ -92,7 +83,7 @@ namespace B2B_Proje.Business.DTOs.ProductDTOs
         public required string Material { get; set; }
 
         [Required(ErrorMessage = "Gender is required.")]
-        public required string Gender { get; set; }
+        public required ProductGender Gender { get; set; }
 
         [Required(ErrorMessage = "Image URL is required.")]
         public required string ImageUrl { get; set; }
@@ -107,5 +98,11 @@ namespace B2B_Proje.Business.DTOs.ProductDTOs
         public int CategoryId { get; set; }
         
         public bool IsActive { get; set; }
+    }
+    
+    public class ProductDeleteDto
+    {
+        [Required(ErrorMessage = "Product ID is required for deletion.")]
+        public int Id { get; set; }
     }
 }

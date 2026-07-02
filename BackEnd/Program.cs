@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using B2B_Proje.DataAccess.Context;
+using B2B_Proje.Business.Services.ProductServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,8 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
+
+builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
