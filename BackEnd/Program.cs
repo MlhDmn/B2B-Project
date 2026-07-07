@@ -1,8 +1,10 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using B2B_Proje.Business.DTOs;
 using B2B_Proje.DataAccess.Context;
 using B2B_Proje.Business.Services.AuthServices;
 using B2B_Proje.Business.Services.ProductServices;
@@ -20,7 +22,27 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(entry => entry.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Value!.Errors
+                        .Select(error => string.IsNullOrWhiteSpace(error.ErrorMessage)
+                            ? "The input was not valid."
+                            : error.ErrorMessage)
+                        .ToArray());
+
+            return new BadRequestObjectResult(ApiResponseDto<object>.Failure(
+                "ValidationError",
+                "Request validation failed.",
+                errors));
+        };
+    });
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -85,6 +107,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseCors("AllowAngularApp");
 

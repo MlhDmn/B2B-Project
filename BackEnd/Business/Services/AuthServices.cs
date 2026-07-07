@@ -60,10 +60,11 @@ namespace B2B_Proje.Business.Services.AuthServices
             return new AuthResponseDto(
                 new JwtSecurityTokenHandler().WriteToken(token),
                 expiresAtUtc,
-                user.Id,
-                user.Email,
-                user.FirstName,
-                user.LastName);
+                new AuthUserDto(
+                    user.Id,
+                    user.Email,
+                    user.FirstName,
+                    user.LastName));
         }
     }
 

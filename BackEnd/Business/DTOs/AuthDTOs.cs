@@ -26,11 +26,14 @@ namespace B2B_Proje.Business.DTOs.AuthDTOs
         public string Password { get; set; } = string.Empty;
     }
 
-    public record AuthResponseDto(
-        string Token,
-        DateTime ExpiresAtUtc,
+    public record AuthUserDto(
         int UserId,
         string Email,
         string FirstName,
         string LastName);
+
+    public record AuthResponseDto(
+        string Token,
+        DateTime ExpiresAtUtc,
+        AuthUserDto User);
 }

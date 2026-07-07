@@ -7,16 +7,18 @@ namespace B2B_Proje.Business.DTOs.ProductDTOs
     public class ProductResponseDto
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public decimal Price { get; set; }
-        public string Origin { get; set; }
-        public string SizeRange { get; set; }
-        public string Material { get; set; }
+        public string Origin { get; set; } = string.Empty;
+        public string SizeRange { get; set; } = string.Empty;
+        public string Material { get; set; } = string.Empty;
         public ProductGender Gender { get; set; }
-        public string ImageUrl { get; set; }
+        public string ImageUrl { get; set; } = string.Empty;
         public int StockQuantity { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
         public int CategoryId { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
+        public string CategoryDescription { get; set; } = string.Empty;
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
     }

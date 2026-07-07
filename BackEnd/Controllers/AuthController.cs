@@ -1,4 +1,5 @@
 using B2B_Proje.Business.DTOs.AuthDTOs;
+using B2B_Proje.Business.DTOs;
 using B2B_Proje.Business.Services.AuthServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,24 +19,32 @@ namespace B2B_Proje.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<ActionResult<AuthResponseDto>> Register(RegisterRequestDto request)
+        public async Task<ActionResult<ApiResponseDto<AuthResponseDto>>> Register(RegisterRequestDto request)
         {
             var response = await _authService.RegisterAsync(request);
             if (response == null)
-                return Conflict(new { message = "An account with this email already exists." });
+            {
+                return Conflict(ApiResponseDto<AuthResponseDto>.Failure(
+                    "EmailAlreadyExists",
+                    "An account with this email already exists."));
+            }
 
-            return Ok(response);
+            return Ok(ApiResponseDto<AuthResponseDto>.Success(response, "Registration successful."));
         }
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ActionResult<AuthResponseDto>> Login(LoginRequestDto request)
+        public async Task<ActionResult<ApiResponseDto<AuthResponseDto>>> Login(LoginRequestDto request)
         {
             var response = await _authService.LoginAsync(request);
             if (response == null)
-                return Unauthorized(new { message = "Invalid email or password." });
+            {
+                return Unauthorized(ApiResponseDto<AuthResponseDto>.Failure(
+                    "InvalidCredentials",
+                    "Invalid email or password."));
+            }
 
-            return Ok(response);
+            return Ok(ApiResponseDto<AuthResponseDto>.Success(response, "Login successful."));
         }
 
         [Authorize]

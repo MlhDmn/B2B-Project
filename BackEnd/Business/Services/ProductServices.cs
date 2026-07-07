@@ -21,49 +21,22 @@ namespace B2B_Proje.Business.Services.ProductServices
         public async Task<IEnumerable<ProductResponseDto>> GetAllProductsAsync()
         {
             var products = await _context.Products
+                .Include(p => p.Category)
                 .Where(p => p.IsActive) 
                 .ToListAsync();
 
-            return products.Select(p => new ProductResponseDto
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Price = p.Price,
-                Origin = p.Origin,
-                SizeRange = p.SizeRange,
-                Material = p.Material,
-                Gender = p.Gender,
-                ImageUrl = p.ImageUrl,
-                StockQuantity = p.StockQuantity,
-                Description = p.Description,
-                CategoryId = p.CategoryId,
-                IsActive = p.IsActive,
-                CreatedAt = p.CreatedAt
-            });
+            return products.Select(MapToProductResponseDto);
         }
 
         public async Task<ProductResponseDto?> GetProductByIdAsync(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null) return null;
 
-            return new ProductResponseDto
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Price = product.Price,
-                Origin = product.Origin,
-                SizeRange = product.SizeRange,
-                Material = product.Material,
-                Gender = product.Gender,
-                ImageUrl = product.ImageUrl,
-                StockQuantity = product.StockQuantity,
-                Description = product.Description,
-                CategoryId = product.CategoryId,
-                IsActive = product.IsActive,
-                CreatedAt = product.CreatedAt
-            };
+            return MapToProductResponseDto(product);
         }
 
         public async Task<ProductResponseDto> CreateProductAsync(ProductCreateDto dto)
@@ -130,6 +103,28 @@ namespace B2B_Proje.Business.Services.ProductServices
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        private static ProductResponseDto MapToProductResponseDto(Product product)
+        {
+            return new ProductResponseDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Price = product.Price,
+                Origin = product.Origin,
+                SizeRange = product.SizeRange,
+                Material = product.Material,
+                Gender = product.Gender,
+                ImageUrl = product.ImageUrl,
+                StockQuantity = product.StockQuantity,
+                Description = product.Description,
+                CategoryId = product.CategoryId,
+                CategoryName = product.Category.Name,
+                CategoryDescription = product.Category.Description,
+                IsActive = product.IsActive,
+                CreatedAt = product.CreatedAt
+            };
         }
     }
 }
