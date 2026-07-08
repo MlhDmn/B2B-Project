@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using B2B_Proje.Business.DTOs;
 using B2B_Proje.DataAccess.Context;
 using B2B_Proje.Business.Services.AuthServices;
+using B2B_Proje.Business.Services.CategoryServices;
 using B2B_Proje.Business.Services.ProductServices;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,6 +46,7 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddEndpointsApiExplorer();
@@ -106,7 +108,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseStaticFiles();
 

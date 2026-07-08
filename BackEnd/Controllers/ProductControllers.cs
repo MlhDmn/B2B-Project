@@ -17,10 +17,12 @@ namespace B2B_Proje.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ApiResponseDto<IEnumerable<ProductResponseDto>>>> GetAll()
+        public async Task<ActionResult<ApiResponseDto<PagedProductsResponseDto>>> GetAll(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
         {
-            var products = await _productService.GetAllProductsAsync();
-            return Ok(ApiResponseDto<IEnumerable<ProductResponseDto>>.Success(
+            var products = await _productService.GetAllProductsAsync(pageNumber, pageSize);
+            return Ok(ApiResponseDto<PagedProductsResponseDto>.Success(
                 products,
                 "Products retrieved successfully."));
         }

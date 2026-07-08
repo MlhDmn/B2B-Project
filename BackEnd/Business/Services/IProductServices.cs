@@ -4,7 +4,7 @@ namespace B2B_Proje.Business.Services.ProductServices
 {
     public interface IProductService
     {
-        Task<IEnumerable<ProductResponseDto>> GetAllProductsAsync();
+        Task<PagedProductsResponseDto> GetAllProductsAsync(int pageNumber, int pageSize);
         Task<ProductResponseDto?> GetProductByIdAsync(int id);
         Task<ProductResponseDto> CreateProductAsync(ProductCreateDto dto);
         Task<ProductResponseDto?> UpdateProductAsync(ProductUpdateDto dto);

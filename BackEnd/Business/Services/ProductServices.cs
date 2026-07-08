@@ -18,14 +18,39 @@ namespace B2B_Proje.Business.Services.ProductServices
             _context = context;
         }
 
-        public async Task<IEnumerable<ProductResponseDto>> GetAllProductsAsync()
+        public async Task<PagedProductsResponseDto> GetAllProductsAsync(int pageNumber, int pageSize)
         {
+            pageNumber = Math.Max(pageNumber, 1);
+            pageSize = Math.Clamp(pageSize, 1, 100);
+
+            var query = _context.Products
+                .Include(p => p.Category)
+                .Where(p => p.IsActive)
+                .OrderByDescending(p => p.CreatedAt)
+                .ThenByDescending(p => p.Id);
+
+            var totalCount = await query.CountAsync();
             var products = await _context.Products
                 .Include(p => p.Category)
-                .Where(p => p.IsActive) 
+                .Where(p => p.IsActive)
+                .OrderByDescending(p => p.CreatedAt)
+                .ThenByDescending(p => p.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            return products.Select(MapToProductResponseDto);
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            return new PagedProductsResponseDto
+            {
+                Items = products.Select(MapToProductResponseDto),
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages = totalPages,
+                HasPreviousPage = pageNumber > 1,
+                HasNextPage = pageNumber < totalPages
+            };
         }
 
         public async Task<ProductResponseDto?> GetProductByIdAsync(int id)
