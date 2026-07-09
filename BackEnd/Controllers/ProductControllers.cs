@@ -19,9 +19,10 @@ namespace B2B_Proje.Controllers
         [HttpGet]
         public async Task<ActionResult<ApiResponseDto<PagedProductsResponseDto>>> GetAll(
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 20)
+            [FromQuery] int pageSize = 20,
+            [FromQuery] string? searchTerm = null)
         {
-            var products = await _productService.GetAllProductsAsync(pageNumber, pageSize);
+            var products = await _productService.GetAllProductsAsync(pageNumber, pageSize, searchTerm);
             return Ok(ApiResponseDto<PagedProductsResponseDto>.Success(
                 products,
                 "Products retrieved successfully."));

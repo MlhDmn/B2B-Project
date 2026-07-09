@@ -18,21 +18,28 @@ namespace B2B_Proje.Business.Services.ProductServices
             _context = context;
         }
 
-        public async Task<PagedProductsResponseDto> GetAllProductsAsync(int pageNumber, int pageSize)
+        public async Task<PagedProductsResponseDto> GetAllProductsAsync(int pageNumber, int pageSize, string? searchTerm = null)
         {
             pageNumber = Math.Max(pageNumber, 1);
             pageSize = Math.Clamp(pageSize, 1, 100);
 
             var query = _context.Products
                 .Include(p => p.Category)
-                .Where(p => p.IsActive)
-                .OrderByDescending(p => p.CreatedAt)
-                .ThenByDescending(p => p.Id);
+                .Where(p => p.IsActive);
+
+            var normalizedSearchTerm = searchTerm?.Trim();
+            if (!string.IsNullOrWhiteSpace(normalizedSearchTerm))
+            {
+                var searchPattern = $"%{normalizedSearchTerm}%";
+                query = query.Where(p =>
+                    EF.Functions.Like(p.Name, searchPattern) ||
+                    EF.Functions.Like(p.Description, searchPattern) ||
+                    EF.Functions.Like(p.Origin, searchPattern) ||
+                    EF.Functions.Like(p.Material, searchPattern));
+            }
 
             var totalCount = await query.CountAsync();
-            var products = await _context.Products
-                .Include(p => p.Category)
-                .Where(p => p.IsActive)
+            var products = await query
                 .OrderByDescending(p => p.CreatedAt)
                 .ThenByDescending(p => p.Id)
                 .Skip((pageNumber - 1) * pageSize)
