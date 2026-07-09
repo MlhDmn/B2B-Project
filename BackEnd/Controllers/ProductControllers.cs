@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using B2B_Proje.Business.DTOs;
 using B2B_Proje.Business.DTOs.ProductDTOs;
@@ -47,7 +48,8 @@ namespace B2B_Proje.Controllers
         [HttpPost]
         public async Task<ActionResult<ApiResponseDto<ProductResponseDto>>> Create([FromBody] ProductCreateDto createDto)
         {
-            var createdProduct = await _productService.CreateProductAsync(createDto);
+            var currentUserId = GetCurrentUserId();
+            var createdProduct = await _productService.CreateProductAsync(createDto, currentUserId);
             return CreatedAtAction(
                 nameof(GetById),
                 new { id = createdProduct.Id },
@@ -64,7 +66,8 @@ namespace B2B_Proje.Controllers
                     "The ID in the URL does not match the payload ID."));
             }
 
-            var updatedProduct = await _productService.UpdateProductAsync(updateDto);
+            var currentUserId = GetCurrentUserId();
+            var updatedProduct = await _productService.UpdateProductAsync(updateDto, currentUserId);
             
             if (updatedProduct == null)
             {
@@ -78,10 +81,17 @@ namespace B2B_Proje.Controllers
                 "Product updated successfully."));
         }
 
+        private int? GetCurrentUserId()
+        {
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(userIdValue, out var userId) ? userId : null;
+        }
+
         [HttpDelete("{id}")]
         public async Task<ActionResult<ApiResponseDto<object>>> Delete(int id)
         {
-            var success = await _productService.DeleteProductAsync(id);
+            var currentUserId = GetCurrentUserId();
+            var success = await _productService.DeleteProductAsync(id, currentUserId);
             
             if (!success)
             {

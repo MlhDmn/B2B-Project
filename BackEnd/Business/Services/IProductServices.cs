@@ -6,8 +6,8 @@ namespace B2B_Proje.Business.Services.ProductServices
     {
         Task<PagedProductsResponseDto> GetAllProductsAsync(int pageNumber, int pageSize, string? searchTerm = null);
         Task<ProductResponseDto?> GetProductByIdAsync(int id);
-        Task<ProductResponseDto> CreateProductAsync(ProductCreateDto dto);
-        Task<ProductResponseDto?> UpdateProductAsync(ProductUpdateDto dto);
-        Task<bool> DeleteProductAsync(int id); 
+        Task<ProductResponseDto> CreateProductAsync(ProductCreateDto dto, int? currentUserId);
+        Task<ProductResponseDto?> UpdateProductAsync(ProductUpdateDto dto, int? currentUserId);
+        Task<bool> DeleteProductAsync(int id, int? currentUserId); 
     }
 }

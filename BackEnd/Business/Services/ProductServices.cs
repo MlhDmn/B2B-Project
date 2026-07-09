@@ -71,7 +71,7 @@ namespace B2B_Proje.Business.Services.ProductServices
             return MapToProductResponseDto(product);
         }
 
-        public async Task<ProductResponseDto> CreateProductAsync(ProductCreateDto dto)
+        public async Task<ProductResponseDto> CreateProductAsync(ProductCreateDto dto, int? currentUserId)
         {
             var newProduct = new Product
             {
@@ -86,7 +86,8 @@ namespace B2B_Proje.Business.Services.ProductServices
                 Description = dto.Description,
                 CategoryId = dto.CategoryId,
                 IsActive = true, 
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                CreatedByUserId = currentUserId
             };
 
             _context.Products.Add(newProduct);
@@ -95,7 +96,7 @@ namespace B2B_Proje.Business.Services.ProductServices
             return await GetProductByIdAsync(newProduct.Id) ?? throw new Exception("Failed to retrieve created product");
         }
 
-        public async Task<ProductResponseDto?> UpdateProductAsync(ProductUpdateDto dto)
+        public async Task<ProductResponseDto?> UpdateProductAsync(ProductUpdateDto dto, int? currentUserId)
         {
             var existingProduct = await _context.Products.FindAsync(dto.Id);
 
@@ -112,6 +113,7 @@ namespace B2B_Proje.Business.Services.ProductServices
             existingProduct.Description = dto.Description;
             existingProduct.CategoryId = dto.CategoryId;
             existingProduct.IsActive = dto.IsActive;
+            existingProduct.UpdatedByUserId = currentUserId;
             
             // Removed the UpdatedAt line from here
 
@@ -121,13 +123,14 @@ namespace B2B_Proje.Business.Services.ProductServices
             return await GetProductByIdAsync(existingProduct.Id);
         }
 
-        public async Task<bool> DeleteProductAsync(int id)
+        public async Task<bool> DeleteProductAsync(int id, int? currentUserId)
         {
             var product = await _context.Products.FindAsync(id);
 
             if (product == null) return false;
 
             product.IsActive = false;
+            product.UpdatedByUserId = currentUserId;
             
             // Removed the UpdatedAt line from here
             
