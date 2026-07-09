@@ -1,4 +1,5 @@
 using System.Text;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using B2B_Proje.Business.DTOs;
 using B2B_Proje.DataAccess.Context;
+using B2B_Proje.DataAccess.Enums;
 using B2B_Proje.Business.Services.AuthServices;
 using B2B_Proje.Business.Services.CategoryServices;
 using B2B_Proje.Business.Services.ProductServices;
@@ -97,6 +99,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("CanManageCategories", policy =>
+        policy.RequireAssertion(context => HasPermission(context.User, UserRole.ManageCategories)));
+});
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -122,3 +130,16 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static bool HasPermission(ClaimsPrincipal user, UserRole requiredPermission)
+{
+    var permissionsClaim = user.FindFirst("permissions")?.Value;
+
+    if (!int.TryParse(permissionsClaim, out var permissionsValue))
+    {
+        return false;
+    }
+
+    var permissions = (UserRole)permissionsValue;
+    return permissions.HasFlag(requiredPermission);
+}

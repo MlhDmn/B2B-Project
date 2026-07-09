@@ -8,6 +8,6 @@ namespace B2B_Proje.Business.Services.ProductServices
         Task<ProductResponseDto?> GetProductByIdAsync(int id);
         Task<ProductResponseDto> CreateProductAsync(ProductCreateDto dto);
         Task<ProductResponseDto?> UpdateProductAsync(ProductUpdateDto dto);
-        Task<bool> DeleteProductAsync(ProductDeleteDto dto); 
+        Task<bool> DeleteProductAsync(int id); 
     }
 }

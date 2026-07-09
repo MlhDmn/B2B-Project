@@ -77,16 +77,16 @@ namespace B2B_Proje.Controllers
                 "Product updated successfully."));
         }
 
-        [HttpDelete]
-        public async Task<ActionResult<ApiResponseDto<object>>> Delete([FromBody] ProductDeleteDto deleteDto)
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ApiResponseDto<object>>> Delete(int id)
         {
-            var success = await _productService.DeleteProductAsync(deleteDto);
+            var success = await _productService.DeleteProductAsync(id);
             
             if (!success)
             {
                 return NotFound(ApiResponseDto<object>.Failure(
                     "ProductNotFound",
-                    $"Product with ID {deleteDto.Id} not found."));
+                    $"Product with ID {id} not found."));
             }
 
             return Ok(ApiResponseDto<object>.Success(null, "Product deleted successfully.")); 

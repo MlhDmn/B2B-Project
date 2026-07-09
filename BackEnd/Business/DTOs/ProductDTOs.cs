@@ -112,10 +112,4 @@ namespace B2B_Proje.Business.DTOs.ProductDTOs
         
         public bool IsActive { get; set; }
     }
-    
-    public class ProductDeleteDto
-    {
-        [Required(ErrorMessage = "Product ID is required for deletion.")]
-        public int Id { get; set; }
-    }
 }

@@ -114,9 +114,9 @@ namespace B2B_Proje.Business.Services.ProductServices
             return await GetProductByIdAsync(existingProduct.Id);
         }
 
-        public async Task<bool> DeleteProductAsync(ProductDeleteDto dto)
+        public async Task<bool> DeleteProductAsync(int id)
         {
-            var product = await _context.Products.FindAsync(dto.Id);
+            var product = await _context.Products.FindAsync(id);
 
             if (product == null) return false;
 
