@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using B2B_Proje.Business.DTOs;
 using B2B_Proje.Business.DTOs.ProductDTOs;
 using B2B_Proje.Business.Services.ProductServices;
+using B2B_Proje.DataAccess.Enums;
 
 namespace B2B_Proje.Controllers
 {
@@ -21,9 +22,23 @@ namespace B2B_Proje.Controllers
         public async Task<ActionResult<ApiResponseDto<PagedProductsResponseDto>>> GetAll(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 20,
-            [FromQuery] string? searchTerm = null)
+            [FromQuery] string? searchTerm = null,
+            [FromQuery] int? categoryId = null,
+            [FromQuery] ProductGender? gender = null,
+            [FromQuery] decimal? minPrice = null,
+            [FromQuery] decimal? maxPrice = null,
+            [FromQuery] bool inStockOnly = false)
         {
-            var products = await _productService.GetAllProductsAsync(pageNumber, pageSize, searchTerm);
+            var products = await _productService.GetAllProductsAsync(
+                pageNumber,
+                pageSize,
+                searchTerm,
+                categoryId,
+                gender,
+                minPrice,
+                maxPrice,
+                inStockOnly);
+
             return Ok(ApiResponseDto<PagedProductsResponseDto>.Success(
                 products,
                 "Products retrieved successfully."));

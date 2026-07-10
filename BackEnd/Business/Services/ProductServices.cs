@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using B2B_Proje.DataAccess.Context;
 using B2B_Proje.DataAccess.Entities; 
+using B2B_Proje.DataAccess.Enums;
 using B2B_Proje.Business.DTOs.ProductDTOs;
 
 namespace B2B_Proje.Business.Services.ProductServices
@@ -18,7 +19,15 @@ namespace B2B_Proje.Business.Services.ProductServices
             _context = context;
         }
 
-        public async Task<PagedProductsResponseDto> GetAllProductsAsync(int pageNumber, int pageSize, string? searchTerm = null)
+        public async Task<PagedProductsResponseDto> GetAllProductsAsync(
+            int pageNumber,
+            int pageSize,
+            string? searchTerm = null,
+            int? categoryId = null,
+            ProductGender? gender = null,
+            decimal? minPrice = null,
+            decimal? maxPrice = null,
+            bool inStockOnly = false)
         {
             pageNumber = Math.Max(pageNumber, 1);
             pageSize = Math.Clamp(pageSize, 1, 100);
@@ -36,6 +45,31 @@ namespace B2B_Proje.Business.Services.ProductServices
                     EF.Functions.Like(p.Description, searchPattern) ||
                     EF.Functions.Like(p.Origin, searchPattern) ||
                     EF.Functions.Like(p.Material, searchPattern));
+            }
+
+            if (categoryId is > 0)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+            }
+
+            if (gender.HasValue)
+            {
+                query = query.Where(p => p.Gender == gender.Value);
+            }
+
+            if (minPrice is >= 0)
+            {
+                query = query.Where(p => p.Price >= minPrice.Value);
+            }
+
+            if (maxPrice is >= 0)
+            {
+                query = query.Where(p => p.Price <= maxPrice.Value);
+            }
+
+            if (inStockOnly)
+            {
+                query = query.Where(p => p.StockQuantity > 0);
             }
 
             var totalCount = await query.CountAsync();
