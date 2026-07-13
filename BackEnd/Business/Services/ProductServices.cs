@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using B2B_Proje.DataAccess.Context;
 using B2B_Proje.DataAccess.Entities; 
@@ -12,11 +14,16 @@ namespace B2B_Proje.Business.Services.ProductServices
 {
     public class ProductService : IProductService
     {
-        private readonly AppDbContext _context;
+        private static readonly string[] AllowedImageExtensions = [".jpg", ".jpeg", ".png", ".webp"];
+        private const long MaxImageSizeBytes = 5 * 1024 * 1024;
 
-        public ProductService(AppDbContext context)
+        private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _environment;
+
+        public ProductService(AppDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
         }
 
         public async Task<PagedProductsResponseDto> GetAllProductsAsync(
@@ -107,6 +114,8 @@ namespace B2B_Proje.Business.Services.ProductServices
 
         public async Task<ProductResponseDto> CreateProductAsync(ProductCreateDto dto, int? currentUserId)
         {
+            var imageUrl = await SaveProductImageAsync(dto.Image);
+
             var newProduct = new Product
             {
                 Name = dto.Name,
@@ -115,7 +124,7 @@ namespace B2B_Proje.Business.Services.ProductServices
                 SizeRange = dto.SizeRange,
                 Material = dto.Material,
                 Gender = dto.Gender,
-                ImageUrl = dto.ImageUrl,
+                ImageUrl = imageUrl,
                 StockQuantity = dto.StockQuantity,
                 Description = dto.Description,
                 CategoryId = dto.CategoryId,
@@ -136,13 +145,17 @@ namespace B2B_Proje.Business.Services.ProductServices
 
             if (existingProduct == null) return null;
 
+            if (dto.Image is not null)
+            {
+                existingProduct.ImageUrl = await SaveProductImageAsync(dto.Image);
+            }
+
             existingProduct.Name = dto.Name;
             existingProduct.Price = dto.Price;
             existingProduct.Origin = dto.Origin;
             existingProduct.SizeRange = dto.SizeRange;
             existingProduct.Material = dto.Material;
             existingProduct.Gender = dto.Gender;
-            existingProduct.ImageUrl = dto.ImageUrl;
             existingProduct.StockQuantity = dto.StockQuantity;
             existingProduct.Description = dto.Description;
             existingProduct.CategoryId = dto.CategoryId;
@@ -194,6 +207,43 @@ namespace B2B_Proje.Business.Services.ProductServices
                 IsActive = product.IsActive,
                 CreatedAt = product.CreatedAt
             };
+        }
+
+        private async Task<string> SaveProductImageAsync(IFormFile image)
+        {
+            ValidateProductImage(image);
+
+            var extension = Path.GetExtension(image.FileName).ToLowerInvariant();
+            var fileName = $"{Guid.NewGuid():N}{extension}";
+            var webRootPath = _environment.WebRootPath ?? Path.Combine(_environment.ContentRootPath, "wwwroot");
+            var uploadsPath = Path.Combine(webRootPath, "uploads", "products");
+
+            Directory.CreateDirectory(uploadsPath);
+
+            var filePath = Path.Combine(uploadsPath, fileName);
+            await using var stream = new FileStream(filePath, FileMode.CreateNew);
+            await image.CopyToAsync(stream);
+
+            return $"/uploads/products/{fileName}";
+        }
+
+        private static void ValidateProductImage(IFormFile image)
+        {
+            if (image.Length == 0)
+            {
+                throw new ArgumentException("Product image cannot be empty.");
+            }
+
+            if (image.Length > MaxImageSizeBytes)
+            {
+                throw new ArgumentException("Product image cannot be larger than 5 MB.");
+            }
+
+            var extension = Path.GetExtension(image.FileName).ToLowerInvariant();
+            if (!AllowedImageExtensions.Contains(extension))
+            {
+                throw new ArgumentException("Product image must be a JPG, PNG, or WEBP file.");
+            }
         }
     }
 }

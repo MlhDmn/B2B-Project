@@ -1,5 +1,6 @@
 using B2B_Proje.DataAccess.Enums;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace B2B_Proje.Business.DTOs.ProductDTOs
 {
@@ -58,8 +59,8 @@ namespace B2B_Proje.Business.DTOs.ProductDTOs
         [Required(ErrorMessage = "Gender is required.")]
         public required ProductGender Gender { get; set; }
 
-        [Required(ErrorMessage = "Image URL is required.")]
-        public required string ImageUrl { get; set; }
+        [Required(ErrorMessage = "Product image is required.")]
+        public required IFormFile Image { get; set; }
 
         [Range(0, int.MaxValue, ErrorMessage = "Stock cannot be negative.")]
         public int StockQuantity { get; set; }
@@ -98,8 +99,7 @@ namespace B2B_Proje.Business.DTOs.ProductDTOs
         [Required(ErrorMessage = "Gender is required.")]
         public required ProductGender Gender { get; set; }
 
-        [Required(ErrorMessage = "Image URL is required.")]
-        public required string ImageUrl { get; set; }
+        public IFormFile? Image { get; set; }
 
         [Range(0, int.MaxValue, ErrorMessage = "Stock cannot be negative.")] 
         public int StockQuantity { get; set; }

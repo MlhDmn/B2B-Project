@@ -61,10 +61,23 @@ namespace B2B_Proje.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ApiResponseDto<ProductResponseDto>>> Create([FromBody] ProductCreateDto createDto)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<ApiResponseDto<ProductResponseDto>>> Create([FromForm] ProductCreateDto createDto)
         {
             var currentUserId = GetCurrentUserId();
-            var createdProduct = await _productService.CreateProductAsync(createDto, currentUserId);
+            ProductResponseDto createdProduct;
+
+            try
+            {
+                createdProduct = await _productService.CreateProductAsync(createDto, currentUserId);
+            }
+            catch (ArgumentException exception)
+            {
+                return BadRequest(ApiResponseDto<ProductResponseDto>.Failure(
+                    "InvalidProductImage",
+                    exception.Message));
+            }
+
             return CreatedAtAction(
                 nameof(GetById),
                 new { id = createdProduct.Id },
@@ -72,7 +85,8 @@ namespace B2B_Proje.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResponseDto<ProductResponseDto>>> Update(int id, [FromBody] ProductUpdateDto updateDto)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<ApiResponseDto<ProductResponseDto>>> Update(int id, [FromForm] ProductUpdateDto updateDto)
         {
             if (id != updateDto.Id)
             {
@@ -82,7 +96,18 @@ namespace B2B_Proje.Controllers
             }
 
             var currentUserId = GetCurrentUserId();
-            var updatedProduct = await _productService.UpdateProductAsync(updateDto, currentUserId);
+            ProductResponseDto? updatedProduct;
+
+            try
+            {
+                updatedProduct = await _productService.UpdateProductAsync(updateDto, currentUserId);
+            }
+            catch (ArgumentException exception)
+            {
+                return BadRequest(ApiResponseDto<ProductResponseDto>.Failure(
+                    "InvalidProductImage",
+                    exception.Message));
+            }
             
             if (updatedProduct == null)
             {
