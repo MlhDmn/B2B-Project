@@ -107,6 +107,9 @@ namespace B2B_Proje.Business.Services.AuthServices
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return null;
 
+            if (!user.IsActive)
+                return null;
+
             user.LastLoginDate = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
