@@ -13,7 +13,8 @@ namespace B2B_Proje.Business.Services.ProductServices
             ProductGender? gender = null,
             decimal? minPrice = null,
             decimal? maxPrice = null,
-            bool inStockOnly = false);
+            bool inStockOnly = false,
+            ProductSortOption sortBy = ProductSortOption.NameAsc);
         Task<ProductResponseDto?> GetProductByIdAsync(int id);
         Task<ProductResponseDto> CreateProductAsync(ProductCreateDto dto, int? currentUserId);
         Task<ProductResponseDto?> UpdateProductAsync(ProductUpdateDto dto, int? currentUserId);

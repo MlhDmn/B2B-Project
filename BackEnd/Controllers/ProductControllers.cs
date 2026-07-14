@@ -27,7 +27,8 @@ namespace B2B_Proje.Controllers
             [FromQuery] ProductGender? gender = null,
             [FromQuery] decimal? minPrice = null,
             [FromQuery] decimal? maxPrice = null,
-            [FromQuery] bool inStockOnly = false)
+            [FromQuery] bool inStockOnly = false,
+            [FromQuery] ProductSortOption sortBy = ProductSortOption.NameAsc)
         {
             var products = await _productService.GetAllProductsAsync(
                 pageNumber,
@@ -37,7 +38,8 @@ namespace B2B_Proje.Controllers
                 gender,
                 minPrice,
                 maxPrice,
-                inStockOnly);
+                inStockOnly,
+                sortBy);
 
             return Ok(ApiResponseDto<PagedProductsResponseDto>.Success(
                 products,

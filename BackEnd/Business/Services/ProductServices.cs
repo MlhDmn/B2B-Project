@@ -34,7 +34,8 @@ namespace B2B_Proje.Business.Services.ProductServices
             ProductGender? gender = null,
             decimal? minPrice = null,
             decimal? maxPrice = null,
-            bool inStockOnly = false)
+            bool inStockOnly = false,
+            ProductSortOption sortBy = ProductSortOption.NameAsc)
         {
             pageNumber = Math.Max(pageNumber, 1);
             pageSize = Math.Clamp(pageSize, 1, 100);
@@ -80,9 +81,23 @@ namespace B2B_Proje.Business.Services.ProductServices
             }
 
             var totalCount = await query.CountAsync();
-            var products = await query
-                .OrderByDescending(p => p.CreatedAt)
-                .ThenByDescending(p => p.Id)
+            var orderedQuery = sortBy switch
+            {
+                ProductSortOption.NameDesc => query
+                    .OrderByDescending(p => p.Name)
+                    .ThenByDescending(p => p.Id),
+                ProductSortOption.PriceAsc => query
+                    .OrderBy(p => p.Price)
+                    .ThenBy(p => p.Id),
+                ProductSortOption.PriceDesc => query
+                    .OrderByDescending(p => p.Price)
+                    .ThenByDescending(p => p.Id),
+                _ => query
+                    .OrderBy(p => p.Name)
+                    .ThenBy(p => p.Id)
+            };
+
+            var products = await orderedQuery
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
