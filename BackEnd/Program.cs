@@ -103,6 +103,9 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("CanManageCategories", policy =>
         policy.RequireAssertion(context => HasPermission(context.User, UserRole.ManageCategories)));
+
+    options.AddPolicy("CanManageUsers", policy =>
+        policy.RequireAssertion(context => HasPermission(context.User, UserRole.ManageUsers)));
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
