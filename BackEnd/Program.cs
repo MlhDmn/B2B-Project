@@ -9,6 +9,7 @@ using B2B_Proje.Business.DTOs;
 using B2B_Proje.DataAccess.Context;
 using B2B_Proje.DataAccess.Enums;
 using B2B_Proje.Business.Services.AuthServices;
+using B2B_Proje.Business.Services.CartServices;
 using B2B_Proje.Business.Services.CategoryServices;
 using B2B_Proje.Business.Services.ProductServices;
 
@@ -49,6 +50,7 @@ builder.Services.AddControllers()
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddEndpointsApiExplorer();
