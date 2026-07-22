@@ -51,7 +51,11 @@ namespace B2B_Proje.Controllers
         [HttpGet("me")]
         public IActionResult Me()
         {
-            return Ok(User.Claims.ToDictionary(claim => claim.Type, claim => claim.Value));
+            var claims = User.Claims
+                .GroupBy(claim => claim.Type)
+                .ToDictionary(group => group.Key, group => group.First().Value);
+
+            return Ok(claims);
         }
     }
 }
