@@ -21,7 +21,10 @@ namespace B2B_Proje.Business.DTOs.UserDTOs
         [Required, MaxLength(50)]
         public string LastName { get; set; } = string.Empty;
 
-        [Required, EmailAddress, MaxLength(100)]
+        [Required]
+        [EmailAddress]
+        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$", ErrorMessage = "Please enter a valid email address with a domain, for example name@example.com.")]
+        [MaxLength(100)]
         public string Email { get; set; } = string.Empty;
 
         public int Permissions { get; set; }
